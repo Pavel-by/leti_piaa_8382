@@ -1,0 +1,17 @@
+14
+a
+e
+a b 20
+b a 20
+a c 30
+c a 30
+a d 10
+d a 10
+b e 30
+e b 30
+d e 10
+e d 10
+b c 40
+c b 40
+c e 20
+e c 20
