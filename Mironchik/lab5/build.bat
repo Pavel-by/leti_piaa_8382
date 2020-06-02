@@ -1,0 +1,1 @@
+g++ main.cpp axo.cpp -o program.exe
