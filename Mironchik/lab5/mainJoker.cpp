@@ -1,6 +1,6 @@
 #include "launchers.cpp"
 
 int main() {
-    launchAxo();
+    launchJoker();
     return 0;
 }
