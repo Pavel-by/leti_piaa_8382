@@ -1,1 +1,0 @@
-g++ mainJoker.cpp -o program.exe

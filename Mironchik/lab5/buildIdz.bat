@@ -1,1 +1,0 @@
-g++ mainIdz.cpp -o program.exe
