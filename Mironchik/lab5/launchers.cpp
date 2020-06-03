@@ -35,11 +35,13 @@ void launchIdz() {
     cout << "Line without matched substrings: ";
     while (start < T.length()) {
         if (index < result.size() && start >= result[index].first) {
+            log("Found pattern before cursor: [" + to_string(result[index].first) + ":" + to_string(result[index].first + P[result[index].second].length()) + ")");
             start = max<int>(start, result[index].first + P[result[index].second].length());
             index++;
             continue;
         }
 
+        log("Echo symbol " + to_string(T[start]));
         cout << T[start];
         start++;
     }

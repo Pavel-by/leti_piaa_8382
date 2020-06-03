@@ -10,6 +10,17 @@ using namespace std;
  */
 #define ALPHABET_SIZE 32
 
+void log(const string &message, bool wrapLine = true) {
+    static bool LOG_ENABLED = false;
+
+    if (LOG_ENABLED) {
+        cout << message;
+
+        if (wrapLine)
+            cout << endl;
+    }
+}
+
 /**
  * Вершина в дереве алгоритма.
  */
@@ -161,6 +172,8 @@ public:
      * идентификатора выступает смещение фрагмента относительно начала паттерна.
      */
     void addString(const string &s, int number) {
+        log("Add string to bor: " + s + " with id " + to_string(number));
+
         Node *cur = root;
 
         for (int i = 0; i < s.length(); i++) {
@@ -168,6 +181,7 @@ public:
 
             // Добавляем элемент, если его нет.
             if (cur->son[c] == nullptr) {
+                log("Add new head to bor: " + to_string(c) + " on index " + to_string(i));
                 cur->son[c] = new Node();
                 cur->son[c]->parent = cur;
                 cur->son[c]->charToParent = c;
@@ -190,6 +204,8 @@ public:
      * @param joker Символ джокера.
      */
     void setJokerString(const string &s, char joker) {
+        log("Set joker string: " + s + " with joker " + to_string(joker));
+
         int start = -1;
         int i = 0;
 
@@ -216,6 +232,8 @@ public:
      * @param P Применяемый паттерн. Данный паттерн не добавляется в дерево, используется лишь его длина.
      */
     void processJoker(const string &s, const string &P) {
+        log("Process string " + s + " with pattern " + P);
+
         // C[N] - количество паттернов, которые начинаются с индекса N, с учетом смещения относительно паттерна с
         // джокером.
         int C[s.length()];
@@ -227,14 +245,22 @@ public:
 
         // Заполняем массив C
         for (int i = 0; i < s.length(); i++) {
+            log("Process symbol " + to_string(s[i]) + " on position " + to_string(i));
             char c = s[i] - 'A';
             cur = getLink(cur, c);
 
             Node *suff = cur;
             while (suff != root) {
                 for (int offset : suff->leafPatternNumber)
-                    if (i - offset - suff->index >= 0)
+                    if (i - offset - suff->index >= 0) {
+                        log("Found subpattern on position " + to_string(i - offset - suff->index));
                         C[i - offset - suff->index]++;
+                    } else {
+                        log(
+                                "Found subpattern on position " + to_string(i - offset - suff->index)
+                                + ". Position is lower than 0, so pattern can't be here."
+                        );
+                    }
 
                 suff = getUp(suff);
             }
@@ -246,8 +272,12 @@ public:
             if (i + P.length() > s.length())
                 break;
 
-            if (C[i] == patternsCount)
+            if (C[i] == patternsCount) {
+                log("Found pattern on position " + to_string(i + 1));
                 cout << i + 1 << endl;
+            } else {
+                log("Found " + to_string(C[i]) + " subpatterns on position " + to_string(i + 1));
+            }
         }
     }
 
@@ -257,23 +287,29 @@ public:
      * @param s Строка, в которой производится поиск.
      */
     vector<pair<int, int>> process(const string &s) {
+        log("Process string " + s);
+
         Node *cur = root;
         vector<pair<int, int>> result;
 
         // Ищем вхождения паттернов в строку
         for (int i = 0; i < s.length(); i++) {
+            log("Process symbol " + to_string(s[i]) + " on position " + to_string(i));
             char c = s[i] - 'A';
             cur = getLink(cur, c);
             Node *suff = cur;
 
             while (suff != root) {
-                for (int number : suff->leafPatternNumber)
+                for (int number : suff->leafPatternNumber) {
+                    log("Found pattern " + to_string(number) + " on position " + to_string(i - suff->index + 1));
                     result.emplace_back(i - suff->index + 1, number);
+                }
 
                 suff = getUp(suff);
             }
         }
 
+        log("Sorting results");
         // Сортируем и выводим результаты
         sort(result.begin(), result.end(), cmp);
         for (auto &val : result) {
@@ -288,7 +324,7 @@ public:
      *
      * @return Вершина, из которой выходит наибольшее количество дуг.
      */
-    Node* findMaxNode() {
+    Node *findMaxNode() {
         return findMaxNode(root);
     }
 
@@ -298,12 +334,14 @@ public:
      * @param v Стартовая вершина - корень дерева, по которому производится поиск.
      * @return Вершина, из которой выходит наибольшее количество дуг.
      */
-    Node* findMaxNode(Node* v) {
-        Node* maxSon = nullptr;
+    Node *findMaxNode(Node *v) {
+        Node *maxSon = nullptr;
 
-        for (Node* son : v->son) {
+        for (Node *son : v->son) {
             if (son == nullptr)
                 continue;
+
+            son = findMaxNode(son);
 
             if (maxSon == nullptr) {
                 maxSon = son;
@@ -326,12 +364,12 @@ public:
      * @param v Вершина, количество дуг из которой необходимо найти.
      * @return Количество дуг, идущих из вершины v
      */
-    int getSonsCount(Node* v) {
+    int getSonsCount(Node *v) {
         if (v->sonsCount == -1) {
             v->sonsCount = 0;
 
-            for (Node* son : v->son)
-                if (son)
+            for (Node *son : v->son)
+                if (son != nullptr)
                     v->sonsCount++;
         }
 
