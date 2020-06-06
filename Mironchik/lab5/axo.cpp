@@ -116,7 +116,8 @@ public:
      */
     Node *getSuffLink(Node *v) {
         if (v->suffLink == nullptr) {
-            log("Compute suffLink for symbol with code " + to_string(v->charToParent + 'A') + " on position " + to_string(v->index));
+            log("Compute suffLink for symbol with code " + to_string(v->charToParent + 'A') + " on position " +
+                to_string(v->index));
             if (v == root || v->parent == root)
                 v->suffLink = root;
             else
@@ -135,7 +136,8 @@ public:
      */
     Node *getLink(Node *v, char c) {
         if (v->go[c] == nullptr) {
-            log("Compute link for symbol with code " + to_string(v->charToParent + 'A') + " on position " + to_string(v->index));
+            log("Compute link for symbol with code " + to_string(v->charToParent + 'A') + " on position " +
+                to_string(v->index));
             if (v->son[c] != nullptr)
                 v->go[c] = v->son[c];
             else if (v == root)
@@ -155,7 +157,8 @@ public:
      */
     Node *getUp(Node *v) {
         if (v->up == nullptr) {
-            log("Compute up link for symbol with code " + to_string(v->charToParent + 'A') + " on position " + to_string(v->index));
+            log("Compute up link for symbol with code " + to_string(v->charToParent + 'A') + " on position " +
+                to_string(v->index));
             if (getSuffLink(v)->isLeaf)
                 v->up = getSuffLink(v);
             else if (getSuffLink(v) == root)
@@ -255,7 +258,8 @@ public:
             Node *suff = cur;
             while (suff != root) {
                 for (int offset : suff->leafPatternNumber) {
-                    log("Found subpattern on position " + to_string(i - offset - suff->index + 1) + ": " + s.substr(i - suff->index, suff->index + 1) + ".", false);
+                    log("Found subpattern on position " + to_string(i - offset - suff->index + 1) + ": " +
+                        s.substr(i - suff->index, suff->index + 1) + ".", false);
                     if (i - offset - suff->index >= 0) {
                         C[i - offset - suff->index]++;
                         log("");
@@ -275,7 +279,11 @@ public:
                 break;
 
             if (C[i] == patternsCount) {
-                log("Found pattern on position " + to_string(i + 1));
+                log("Found pattern on position " + to_string(i + 1) + ". ", false);
+                log("By the algorithm, pattern considered found on position k when m subpatterns founded on position k"
+                    ", where m - total count of subpatterns. So, as you can see, in that case " + to_string(C[i])
+                    + " subpatterns was found on position " + to_string(i) + ", and we can say, that pattern " + P
+                    + " is really located here.");
                 cout << i + 1 << endl;
             } else {
                 log("Found " + to_string(C[i]) + " subpatterns on position " + to_string(i + 1));
@@ -303,7 +311,8 @@ public:
 
             while (suff != root) {
                 for (int number : suff->leafPatternNumber) {
-                    log("Found pattern " + s.substr(i - suff->index, suff->index + 1) + " on position " + to_string(i - suff->index + 1));
+                    log("Found pattern " + s.substr(i - suff->index, suff->index + 1) + " on position " +
+                        to_string(i - suff->index + 1));
                     result.emplace_back(i - suff->index + 1, number);
                 }
 
