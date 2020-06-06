@@ -11,7 +11,7 @@ using namespace std;
 #define ALPHABET_SIZE 32
 
 void log(const string &message, bool wrapLine = true) {
-    static bool LOG_ENABLED = false;
+    static bool LOG_ENABLED = true;
 
     if (LOG_ENABLED) {
         cout << message;
@@ -116,6 +116,7 @@ public:
      */
     Node *getSuffLink(Node *v) {
         if (v->suffLink == nullptr) {
+            log("Compute suffLink for symbol with code " + to_string(v->charToParent + 'A') + " on position " + to_string(v->index));
             if (v == root || v->parent == root)
                 v->suffLink = root;
             else
@@ -134,6 +135,7 @@ public:
      */
     Node *getLink(Node *v, char c) {
         if (v->go[c] == nullptr) {
+            log("Compute link for symbol with code " + to_string(v->charToParent + 'A') + " on position " + to_string(v->index));
             if (v->son[c] != nullptr)
                 v->go[c] = v->son[c];
             else if (v == root)
@@ -153,6 +155,7 @@ public:
      */
     Node *getUp(Node *v) {
         if (v->up == nullptr) {
+            log("Compute up link for symbol with code " + to_string(v->charToParent + 'A') + " on position " + to_string(v->index));
             if (getSuffLink(v)->isLeaf)
                 v->up = getSuffLink(v);
             else if (getSuffLink(v) == root)
@@ -245,22 +248,21 @@ public:
 
         // Заполняем массив C
         for (int i = 0; i < s.length(); i++) {
-            log("Process symbol " + to_string(s[i]) + " on position " + to_string(i));
+            log("Process symbol with code " + to_string(s[i]) + " on position " + to_string(i));
             char c = s[i] - 'A';
             cur = getLink(cur, c);
 
             Node *suff = cur;
             while (suff != root) {
-                for (int offset : suff->leafPatternNumber)
+                for (int offset : suff->leafPatternNumber) {
+                    log("Found subpattern on position " + to_string(i - offset - suff->index + 1) + ": " + s.substr(i - suff->index, suff->index + 1) + ".", false);
                     if (i - offset - suff->index >= 0) {
-                        log("Found subpattern on position " + to_string(i - offset - suff->index));
                         C[i - offset - suff->index]++;
+                        log("");
                     } else {
-                        log(
-                                "Found subpattern on position " + to_string(i - offset - suff->index)
-                                + ". Position is lower than 0, so pattern can't be here."
-                        );
+                        log(". Position is lower than 0, so pattern can't be here.");
                     }
+                }
 
                 suff = getUp(suff);
             }
@@ -294,14 +296,14 @@ public:
 
         // Ищем вхождения паттернов в строку
         for (int i = 0; i < s.length(); i++) {
-            log("Process symbol " + to_string(s[i]) + " on position " + to_string(i));
+            log("Process symbol with code " + to_string(s[i]) + " on position " + to_string(i));
             char c = s[i] - 'A';
             cur = getLink(cur, c);
             Node *suff = cur;
 
             while (suff != root) {
                 for (int number : suff->leafPatternNumber) {
-                    log("Found pattern " + to_string(number) + " on position " + to_string(i - suff->index + 1));
+                    log("Found pattern " + s.substr(i - suff->index, suff->index + 1) + " on position " + to_string(i - suff->index + 1));
                     result.emplace_back(i - suff->index + 1, number);
                 }
 
